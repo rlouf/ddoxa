@@ -7,7 +7,10 @@
 :EXPORT_FILE_NAME: pyramide-vote-participation
 :EXPORT_DATE: 2022-03-10
 :EXPORT_HUGO_CUSTOM_FRONT_MATTER: :math true
+:EXPORT_HUGO_CUSTOM_FRONT_MATTER+: :description
 :END:
+
+#+description: Pyramide des âges et participation aux élections.
 
 #+begin_src elisp :results silent :exports none
 (pyvenv-workon 'pyramide)
@@ -276,11 +279,19 @@ Cette analyse simple soulève plusieurs questions auxquelles j'essaierai de rép
 1. Est-ce que ceci a toujours été le cas : quelle a été l'évolution de l'âge médian du corps électoral dans les 50 dernières années ?
 2. Est-ce que cela a de l'importance : est-ce qu'il y a un vote différencié en fonction de l'âge ? Si oui, qui est le candidat des jeunes ?
 
-/Cet article soulève d'autes questions pour vous ? J'ai fait une erreur ? N'hésitez pas à me contactez ([[https://twitter.com/remilouf][@remilouf]]) sur Twitter !/
+/Cet article soulève d'autes questions pour vous ? J'ai fait une erreur ? N'hésitez pas à me contacter ([[https://twitter.com/remilouf][@remilouf]]) sur Twitter !/
 
-#+description: Age médian en supposant que tous les 18-35 ans votent
 #+begin_src python :session :results silent :exports none
 participation_young = [1., 1.] + participation[2:]
 young = get_number_of_votes(population, seuils,  participation_young)
 print(18 + bisect.bisect_left(np.cumsum(young)/np.sum(young), 0.5))
 #+end_src
+
+** TODO La pyramide du vote II - Historique :visualisation:
+
+Récupérer les données de la pyramide des âges depuis X
+
+https://www.insee.fr/fr/outil-interactif/5014911/pyramide.htm#!y=2058&c=0
+
+Plot median age of voting per year. Then gif showing the evolution of both the pyramide and the median age.
+** TODO La pyramide du vote III - Le candidat des jeunes :visualisation:

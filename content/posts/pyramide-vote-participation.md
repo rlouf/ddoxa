@@ -42,4 +42,4 @@ Cette analyse simple soulève plusieurs questions auxquelles j'essaierai de rép
 1.  Est-ce que ceci a toujours été le cas : quelle a été l'évolution de l'âge médian du corps électoral dans les 50 dernières années ?
 2.  Est-ce que cela a de l'importance : est-ce qu'il y a un vote différencié en fonction de l'âge ? Si oui, qui est le candidat des jeunes ?
 
-_Cet article soulève d'autes questions pour vous ? J'ai fait une erreur ? N'hésitez pas à me contactez ([@remilouf](https://twitter.com/remilouf)) sur Twitter !_
+_Cet article soulève d'autes questions pour vous ? J'ai fait une erreur ? N'hésitez pas à me contacter ([@remilouf](https://twitter.com/remilouf)) sur Twitter !_
