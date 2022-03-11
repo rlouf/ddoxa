@@ -1,3 +1,4 @@
+baseURL: "https://www.ddoxa.fr"
 title: Ddoxa
 paginate: 10
 theme: PaperMod
@@ -8,7 +9,6 @@ buildDrafts: false
 buildFuture: false
 buildExpired: false
 enableEmoji: true
-# googleAnalytics: UA-123-45
 
 minify:
     disableXML: true
