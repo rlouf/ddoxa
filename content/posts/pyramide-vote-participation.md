@@ -1,7 +1,7 @@
 +++
 title = "La pyramide du vote I - Participation"
 author = ["Rémi Louf"]
-description = "Age médian en supposant que tous les 18-35 ans votent"
+description = "Pyramide des âges et participation aux élections."
 date = 2022-03-10
 tags = ["visualisation"]
 draft = false
