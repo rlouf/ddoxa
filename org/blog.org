@@ -3,7 +3,7 @@
 #+HUGO_SECTION: posts
 
 * Politique
-** La pyramide du vote I - Participation :visualisation:politique:
+** Note #1 - La pyramide du vote: âge et participation :visualisation:politique:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pyramide-vote-participation
 :EXPORT_DESCRIPTION: Pyramide des âges et participation aux élections.

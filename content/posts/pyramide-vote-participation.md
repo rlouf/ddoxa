@@ -1,9 +1,9 @@
 +++
-title = "La pyramide du vote I - Participation"
+title = "Note #1 - La pyramide du vote: âge et participation"
 author = ["Rémi Louf"]
 description = "Pyramide des âges et participation aux élections."
 date = 2022-03-10
-tags = ["visualisation"]
+tags = ["visualisation", "politique"]
 draft = false
 math = true
 +++
