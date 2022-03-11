@@ -1,16 +1,16 @@
+#+STARTUP: show2levels hideblocks
 #+HUGO_BASE_DIR: ../
 #+HUGO_SECTION: posts
 
 * Politique
-** La pyramide du vote I - Participation :visualisation:
+** La pyramide du vote I - Participation :visualisation:politique:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pyramide-vote-participation
+:EXPORT_DESCRIPTION: Pyramide des âges et participation aux élections.
 :EXPORT_DATE: 2022-03-10
 :EXPORT_HUGO_CUSTOM_FRONT_MATTER: :math true
 :EXPORT_HUGO_CUSTOM_FRONT_MATTER+: :description
 :END:
-
-#+description: Pyramide des âges et participation aux élections.
 
 #+begin_src elisp :results silent :exports none
 (pyvenv-workon 'pyramide)
@@ -295,3 +295,20 @@ https://www.insee.fr/fr/outil-interactif/5014911/pyramide.htm#!y=2058&c=0
 
 Plot median age of voting per year. Then gif showing the evolution of both the pyramide and the median age.
 ** TODO La pyramide du vote III - Le candidat des jeunes :visualisation:
+
+* Energie
+** TODO L'énergie nucléaire n'est pas intermittente
+
+* Autres
+** TODO Les notes du bac
+
+* Economie
+** TODO La courbe des taux au fil du temps
+** Inflation
+*** TODO Fit linear trend + chock
+*** TODO Décomposition du CPI
+** TODO Système financier
+** TODO Chomage vs revenus
+Comparer les courbes de revenus de la population et anciens revenus pour personnes touchant le chomage.
+** TODO That damn inflation curve since 1975
+** TODO Reproduce the
