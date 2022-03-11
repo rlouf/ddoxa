@@ -1,0 +1,88 @@
+title: Ddoxa
+paginate: 10
+theme: PaperMod
+
+enableInlineShortcodes: true
+enableRobotsTXT: true
+buildDrafts: false
+buildFuture: false
+buildExpired: false
+enableEmoji: true
+# googleAnalytics: UA-123-45
+
+minify:
+    disableXML: true
+    # minifyOutput: true
+
+outputs:
+    home:
+        - HTML
+        - RSS
+        - JSON
+
+params:
+    env: production # to enable google analytics, opengraph, twitter-cards and schema.
+    description: "Raconter la politique et l'économie avec des données"
+    author: Rémi Louf
+
+    defaultTheme: auto
+    ShowShareButtons: true
+    ShowReadingTime: true
+    displayFullLangName: true
+    ShowPostNavLinks: true
+    ShowBreadCrumbs: true
+    ShowCodeCopyButtons: true
+    ShowToc: false
+    # comments: false
+    images: ["papermod-cover.png"]
+
+    homeInfoParams:
+        Title: Ddoxa
+        Content: >
+          Données, visualisations et analyses statistiques pour raconter la politique et l'économie. Plus structuré que [@remilouf](https://twitter.com/rlouf)
+
+    socialIcons:
+        - name: twitter
+          url: "https://twitter.com/remilouf"
+        - name: RsS
+          url: "index.xml"
+
+    assets:
+        disableHLJS: true
+
+#- Je suis heureux que mes analyses puissent être consultées gratuitement par des miliers de personnes. Mais ce qui m'encourage à continuer ce sont les abonnés (payamts) à la newsletter. Si vous voulez supporter mon effort, et m'encourager à déveloper cette initiative, cliquez sur le bouton ci-dessous et choisissez l'une des trois options disponibles.
+
+taxonomies:
+    category: categories
+    tag: tags
+    series: series
+
+# Code markup and syntax highlighting
+markup:
+  highlight:
+    style: nord
+    tabWidth: 4
+
+privacy:
+    vimeo:
+        disabled: false
+        simple: true
+
+    twitter:
+        disabled: false
+        enableDNT: true
+        simple: true
+
+    instagram:
+        disabled: false
+        simple: true
+
+    youtube:
+        disabled: false
+        privacyEnhanced: true
+
+services:
+    instagram:
+        disableInlineCSS: true
+    twitter:
+        disableInlineCSS: true

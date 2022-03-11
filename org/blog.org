@@ -1,0 +1,286 @@
+#+HUGO_BASE_DIR: ../
+#+HUGO_SECTION: posts
+
+* Politique
+** La pyramide du vote I - Participation :visualisation:
+:PROPERTIES:
+:EXPORT_FILE_NAME: pyramide-vote-participation
+:EXPORT_DATE: 2022-03-10
+:EXPORT_HUGO_CUSTOM_FRONT_MATTER: :math true
+:END:
+
+#+begin_src elisp :results silent :exports none
+(pyvenv-workon 'pyramide)
+#+end_src
+
+#+name: Âge de la population en 2022 (INSEE)
+#+begin_src python :session :results silent :exports none
+"""
+These data were downloaded from https://www.insee.fr/fr/statistiques/2381472#tableau-figure1
+Key = age révolu (100 = 100 ans et plus)
+Value = nombre de personnes dans la population française
+"""
+population = {
+    0: 690942,
+    1: 695063,
+    2: 716123,
+    3: 725576,
+    4: 743039,
+    5: 762367,
+    6: 783332,
+    7: 810097,
+    8: 817631,
+    9: 835242,
+    10: 840895,
+    11: 862319,
+    12: 853243,
+    13: 859175,
+    14: 854278,
+    15: 867238,
+    16: 849665,
+    17: 841314,
+    18: 831528,
+    19: 827807,
+    20: 830697,
+    21: 835200,
+    22: 778873,
+    23: 765236,
+    24: 741535,
+    25: 746399,
+    26: 738131,
+    27: 722662,
+    28: 728320,
+    29: 764166,
+    30: 779572,
+    31: 801165,
+    32: 806948,
+    33: 821127,
+    34: 824250,
+    35: 839830,
+    36: 838306,
+    37: 834328,
+    38: 820145,
+    39: 868806,
+    40: 874869,
+    41: 886274,
+    42: 837272,
+    43: 818115,
+    44: 820176,
+    45: 799456,
+    46: 824241,
+    47: 866161,
+    48: 907462,
+    49: 927759,
+    50: 921723,
+    51: 900060,
+    52: 888235,
+    53: 875245,
+    54: 871895,
+    55: 890989,
+    56: 891608,
+    57: 899644,
+    58: 887307,
+    59: 856255,
+    60: 853667,
+    61: 846060,
+    62: 839655,
+    63: 816587,
+    64: 809514,
+    65: 800032,
+    66: 787325,
+    67: 779454,
+    68: 760616,
+    69: 768507,
+    70: 743139,
+    71: 764252,
+    72: 744985,
+    73: 736777,
+    74: 715221,
+    75: 666821,
+    76: 498019,
+    77: 478997,
+    78: 459971,
+    79: 418516,
+    80: 365621,
+    81: 371202,
+    82: 379585,
+    83: 357369,
+    84: 337938,
+    85: 322009,
+    86: 294853,
+    87: 278596,
+    88: 246130,
+    89: 229535,
+    90: 197481,
+    91: 172622,
+    92: 135469,
+    93: 111515,
+    94: 88537,
+    95: 69657,
+    96: 53102,
+    97: 38627,
+    98: 27946,
+    99: 19134,
+    100: 31037,
+}
+#+end_src
+
+#+name: Sondage 02/03/2022 (Ipsos)
+#+begin_src python :session :results silent :exports none
+seuils = [25, 35, 50, 60, 70, 101]  # 101 car INSEE donne jusque "100 et plus"
+participation = [.61, .67, .76, .79, .85, .91]
+intentions = {
+    "Mélenchon": [.17, .21, .14, .13, .10, .04],
+    "Jadot": [.13, .07, .09, .08, .06, .05],
+    "Macron": [.29, .26, .28, .25, .32, .38],
+    "Pécresse": [.08, .03, .09, .09, .10, .22],
+    "Le Pen": [.10, .20, .17, .19, .15, .08],
+    "Zemmour": [.14, .10, .10, .15, .14, .15],
+}
+#+end_src
+
+#+begin_src python :session :results silent :exports none
+import bisect
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import gridspec
+
+def get_number_of_votes(population, seuils, ratio):
+    num_votes = []
+    eligible_ages = list(population.keys())[18:]
+    for age in eligible_ages:
+        idx = bisect.bisect_left(seuils, age)
+        num_votes.append(int(population[age] * ratio[idx]))
+
+    return num_votes
+
+eligible = get_number_of_votes(population, seuils, [1.] * len(participation))
+voting = get_number_of_votes(population, seuils, participation)
+
+median_eligible = 18 + bisect.bisect_left(np.cumsum(eligible)/np.sum(eligible), 0.5)
+median_voting = 18 + bisect.bisect_left(np.cumsum(voting)/np.sum(voting), 0.5)
+#+end_src
+
+Une période électorale qui se respecte se doit de rappeler quelques lieux communs. Avec la montée des taux d'abstention et du commentariat professionnel s'est installée l'idée que si les jeunes ont à subir des politiques menées pour séduire les plus âgés, c'est bien parce qu'ils ne votent pas.
+
+On ne peut pas nier que le /taux/ d'abstention des jeunes est élevé. Regardons par exemple les intentions de participations pour la présidentielle 2022 telles que données par le [[https://www.ipsos.com/sites/default/files/ct/news/documents/2022-03/Ipsos%20-%20Enque%CC%82te%20Electorale%20-%20Vague%206%20-%205%20mars%202022.pdf][sondage Ipsos du 3 mars 2022 pour la fondation Jean-Jaurès et Le Monde]] :
+
+|            Âge | Participation (preque) certaine |
+|----------------+---------------------------------|
+|          18-24 |                             61% |
+|          25-34 |                             67% |
+|          35-50 |                             76% |
+|          50-60 |                             79% |
+|          60-70 |                             85% |
+| 70 ans et plus |                             91% |
+
+La différence est nette, avec 30 points de pourcentage de différence entre les plus jeunes (18-24 ans) et les plus âgés (70 ans et plus).
+
+Mais ce n'est pas si simple. Le résultat du vote est déterminé par un pourcentage du /corps électoral/, mais les pourcentages donnés plus haut ne disent rien de la répartition par classe d'âge du corps électoral. Or *avant même de parler d'abstention, la pyramide des âges introduit une déformation importante dans la distribution des votes*.
+
+Pour le voir on représente la population par année révolue [[https://www.insee.fr/fr/statistiques/2381472][donnée par l'INSEE]] (gris), et on représente la population qui est certaine ou presque certaine d'aller voter sur le même graphique (en noir) en utilisant les données du tableau précédent :
+
+#+begin_src python :session :results file :exports results :var filename="figures/pyramide-vote-abstention-pyramide.png"
+fig = plt.figure(figsize=(6, 8))
+gs = gridspec.GridSpec(3, 1, height_ratios = [.15,1,.15], figure=fig)
+
+ax = plt.subplot(gs[0, 0])
+ax.text(
+    0.5,
+    1.,
+    f"Pyramide du vote",
+    ha="center",
+    va="top",
+    fontname="Futura PT",
+    fontsize=25,
+    fontweight="bold",
+)
+ax.axis("off")
+
+pop = list(population.values())[18:]
+ages = list(population.keys())[18:]
+num_votes = voting
+
+ax = plt.subplot(gs[1, 0])
+ax.barh(
+    ages,
+    pop,
+    height=1.0,
+    align="edge",
+    color="lightgray",
+    ec="white",
+    label="Population en âge d'aller voter",
+)
+
+ax.barh(
+    ages,
+    num_votes,
+    height=1.0,
+    align="edge",
+    color="black",
+    ec="white",
+    label="(Presque) certains d'aller voter",
+)
+
+ax.spines["right"].set_visible(False)
+ax.spines["top"].set_visible(False)
+ax.spines["left"].set_visible(False)
+
+ax.spines["right"].set_position(('outward', 10))
+ax.spines["bottom"].set_position(('outward', 10))
+
+ax.tick_params('y', length=0)
+ax.set_yticks([18, 25, 35, 50, 60, 70, 80, 90, 100])
+ax.set_ylim([18,100])
+ax.set_ylabel("Âge révolu")
+
+ax.set_xlabel("Population (en milliers)")
+ax.set_xlim([0, max(pop)])
+ax.set_xticks([100_000, 300_000, 500_000, 700_000, 900_000], [100, 300, 500, 700, 900])
+plt.legend(frameon=False)
+
+ax = plt.subplot(gs[2, 0])
+ax.text(
+    1,
+    -0.1,
+    f"Tracé avec soin par @pollsposition",
+    ha="right",
+    va="top",
+    fontname="Futura PT",
+    fontsize=12,
+    color="lightgray"
+)
+ax.axis("off")
+gs.update(hspace=-0.05)
+
+plt.savefig(filename, bbox_inches="tight")
+filename
+#+end_src
+
+#+caption: Pour obtenir la pyramide des âges des personnes certaines d'aller voter on applique le pourcentage de participation de façon uniforme à toute la tranche d'âge correspondante. Ce qui donne un rendu un peu surprenant pour les centenaires par exemple, mais sans vraiment affecter les conclusions.
+#+attr_org: :height 400
+#+RESULTS:
+[[file:figures/pyramide-vote-abstention-pyramide.png]]
+
+La représentation graphique est parlante, mais pour ne pas en tirer les mauvaises conclusions calculons la quantité qui nous intéresse: l'âge qui sépare le corps électoral en deux i.e. pour lequel les personnes plus âgées ont la majorité absolue. C'est-à-dire, l'âge médian d'abord du corps électoral, puis des personnes (presque) certaines d'aller voter. S'ils sont proches c'est la pyramide des âges qui est en cause plutôt que les différences en termes de participation.
+
+L'âge médian du corps électoral est de /50 ans/, alors que celui des personnes (presque) certaines d'aller voter de /53 ans/[^1]. *On passe donc beaucoup de temps à déplorer le taux d'abstention des jeunes, mais c'est surtout la pyramide des âges qui est déterminante.*
+
+[^1]: Le chiffre de 53 ans pour l'âge médian des personnes (presque) certaines d'aller voter est à prendre avec des pincettes. En effet, les taux de participation sont données par tranche d'âge, et la distribution à l'intérieur de ces tranches est susceptible d'avoir une (faible) influence sur l'âge médian. Il serait envisageable de calculer la distribution des âges médians plausibles, mais cela prendrait du temps et je ne m'attends pas à ce que cela change les conclusions.
+
+#+begin_quote
+Les plus de 50 ans sont en majorité absolue dans le corps électoral.
+#+end_quote
+
+Cette analyse simple soulève plusieurs questions auxquelles j'essaierai de répondre dans les prochaines notes:
+1. Est-ce que ceci a toujours été le cas : quelle a été l'évolution de l'âge médian du corps électoral dans les 50 dernières années ?
+2. Est-ce que cela a de l'importance : est-ce qu'il y a un vote différencié en fonction de l'âge ? Si oui, qui est le candidat des jeunes ?
+
+/Cet article soulève d'autes questions pour vous ? J'ai fait une erreur ? N'hésitez pas à me contactez ([[https://twitter.com/remilouf][@remilouf]]) sur Twitter !/
+
+#+description: Age médian en supposant que tous les 18-35 ans votent
+#+begin_src python :session :results silent :exports none
+participation_young = [1., 1.] + participation[2:]
+young = get_number_of_votes(population, seuils,  participation_young)
+print(18 + bisect.bisect_left(np.cumsum(young)/np.sum(young), 0.5))
+#+end_src
