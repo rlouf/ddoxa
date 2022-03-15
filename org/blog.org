@@ -8,8 +8,7 @@
 :EXPORT_FILE_NAME: pyramide-vote-participation
 :EXPORT_DESCRIPTION: Pyramide des âges et participation aux élections.
 :EXPORT_DATE: 2022-03-10
-:EXPORT_HUGO_CUSTOM_FRONT_MATTER: :math true
-:EXPORT_HUGO_CUSTOM_FRONT_MATTER+: :description
+:CUSTOM_ID: pyramide-vote-participation
 :END:
 
 #+begin_src elisp :results silent :exports none
@@ -287,14 +286,385 @@ young = get_number_of_votes(population, seuils,  participation_young)
 print(18 + bisect.bisect_left(np.cumsum(young)/np.sum(young), 0.5))
 #+end_src
 
-** TODO La pyramide du vote II - Historique :visualisation:
+** TODO Note #2 - La pyramide du vote: depuis 1958 :visualisation:
+:PROPERTIES:
+:EXPORT_FILE_NAME: pyramide-vote-historique
+:EXPORT_DESCRIPTION: Pyramide des âges dans la 5e République
+:EXPORT_DATE: 2022-03-13
+:CUSTOM_ID: pyramide-vote-historique
+:END:
+
+#+begin_src elisp :results silent :exports none
+(pyvenv-workon 'pyramide)
+#+end_src
+
+#+title: Format the data
+#+begin_src python :session :results silent :exports none
+import bisect
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
+
+from data.pyramide_ages_insee import hommes, femmes, years
+
+pyramides = {y: {} for y in years}
+for age, (nums_h, nums_f) in enumerate(zip(hommes, femmes)):
+    for y, (h, f) in enumerate(zip(nums_h, nums_f)):
+        try:
+            h = int(h)
+            f = int(f)
+        except:
+            continue
+        pyramides[years[y]][age]  = h + f
+
+print(pyramides[1901][80])
+#+end_src
+
+#+title: Compute the median age
+#+begin_src python :session :results silent :exports none
+medians = {}
+for year, population in pyramides.items():
+    majority = 21
+    if year >= 1975:
+        majority = 18
+    numbers = list(population.values())[majority:]
+    median = majority + bisect.bisect_left(np.cumsum(numbers)/np.sum(numbers), 0.5)
+    medians[year] = median
+print(medians)
+#+end_src
+
+
+Dans la [[id:pyramide-vote-participation][première note de cette série]] nous nous sommes intéressé à la pyramide des âges du corps électoral français et la façon dont elle est déformée par l'abstention. L'âge médian du corps électoral est de 50 ans en 2022. Ce chiffre paraît élevé au premier abord, mais avant d'affirmer que la démographie est responsable d'une mutation politique encore faudrait-il que l'âge médian ait été plus faible par le passé.
+
+Un [[https://www.ined.fr/fichier/s_rubrique/18851/pop_et_soc_francais_110.fr.pdf][article édité par l'INED]] en 1978 nous donne un premier indice :
+
+#+attr_org: :width 300
+[[file:../static/ox-hugo/FN4eQi-X0AASDUu.png]]
+
+
+Regardons l'évolution de l'âge médian depuis les premières élections au suffrage universel de la Ve République, en 1965. Nous utilisons les [[https://www.insee.fr/fr/statistiques/3312958][données démographiques historiques données par l'INSEE]] :
+
+#+begin_src python :session :results file :exports results :var filename=(org-babel-temp-file "figure_" ".png")
+fig = plt.figure(figsize=(12,8))
+gs = gridspec.GridSpec(3, 1, height_ratios = [.15,1,.15], figure=fig)
+
+ax = plt.subplot(gs[0, 0])
+ax.text(
+    0.5,
+    1.,
+    f"Âge médian du corps électoral sous la Ve République",
+    ha="center",
+    va="top",
+    fontname="Futura PT",
+    fontsize=25,
+    fontweight="bold",
+)
+ax.axis("off")
+
+ax = plt.subplot(gs[1,0])
+election = [1965, 1969, 1974, 1981, 1988, 1995, 2002, 2007, 2012, 2017]
+for year in election:
+    ax.vlines(year, ymin=40, ymax=medians[year], ls='--', color='lightgray')
+    ax.text(year, 0.5+medians[year], f"{medians[year]}", ha="center", va="bottom", fontname="Futura PT", fontweight="bold", fontsize=18)
+
+ax.plot(election, [medians[y] for y in election], 'k--o')
+ax.set_xlabel("Annéee (élection présidentielle au suffrage universel)", fontname="Futura PT", fontsize=16)
+ax.spines["top"].set_visible(False)
+ax.spines["right"].set_visible(False)
+ax.spines["left"].set_visible(False)
+
+ax.set_xlim([1958, 2019])
+ax.set_ylim([40, 51])
+ax.set_xticks(election)
+
+ax.set_yticks([])
+
+ax = plt.subplot(gs[2, 0])
+ax.text(
+    1,
+    -0.1,
+    f"Tracé avec soin par @pollsposition",
+    ha="right",
+    va="top",
+    fontname="Futura PT",
+    fontsize=12,
+    color="lightgray"
+)
+ax.axis("off")
+gs.update(hspace=-0.05)
+
+plt.savefig(filename, bbox_inches="tight")
+filename
+#+end_src
+
+#+attr_org: :width 700
+#+RESULTS:
+[[file:]]
+
+Il est utile de rappeler pour comprendre le passage de 1974 à 1981 que [[https://www.leparisien.fr/archives/la-majorite-a-18-ans-c-etait-il-y-a-quarante-ans-05-07-2014-3978415.php][la majorité est passée de 21 ans à 18 ans en 1974]]. Aussi pour mieux comprendre la tendance il peut être utile de visualiser l'évolution de la pyramide des âges en parallèle :
+
+#+begin_src python :session :async :results file :exports results :var filename=(org-babel-temp-file "figure_" ".png")
+def add_title(ax, title):
+    ax.text(
+        0.5,
+        1.0,
+        title,
+        ha="center",
+        va="top",
+        fontname="Futura PT",
+        fontsize=25,
+        fontweight="bold",
+    )
+    ax.axis("off")
+
+
+def add_pyramide(ax, population, median, age_min):
+    color = "#4C566A"
+    ages = list(population.keys())[age_min:]
+    num_votes = list(population.values())[age_min:]
+    ax.barh(
+        ages,
+        num_votes,
+        height=1.0,
+        align="edge",
+        color=["lightgray"] * (median - age_min)
+        + [color]
+        + ["lightgray"] * (100 + age_min - median),
+        ec="white",
+        label="(Presque) certains d'aller voter",
+    )
+
+    ax.spines["right"].set_visible(False)
+    ax.spines["top"].set_visible(False)
+    ax.spines["left"].set_visible(False)
+
+    ax.spines["right"].set_position(("outward", 10))
+    ax.spines["bottom"].set_position(("outward", 10))
+
+    ax.text(
+        100_000,
+        median + 1,
+        f"{median} ans",
+        va="bottom",
+        fontname="Futura PT",
+        fontweight="bold",
+        color=color,
+        fontsize=22,
+    )
+
+    ax.tick_params("y", length=0)
+    ax.set_yticks([18, 25, 35, 50, 60, 70, 80, 90, 100])
+    ax.set_ylim([18, 100])
+    ax.set_ylabel("Âge révolu")
+
+    ax.set_xlabel("Population (en milliers)")
+    ax.set_xlim([0, max(num_votes)])
+    ax.set_xticks(
+        [100_000, 300_000, 500_000, 700_000, 900_000], [100, 300, 500, 700, 900]
+    )
+
+
+def add_watermark(ax):
+    ax.text(
+        1,
+        -0.1,
+        f"Tracé avec soin par @pollsposition",
+        ha="right",
+        va="top",
+        fontname="Futura PT",
+        fontsize=12,
+        color="lightgray",
+    )
+    ax.axis("off")
+
+
+def plot_pyramide(population, median, age_min):
+    fig = plt.figure(figsize=(6, 9))
+    gs = gridspec.GridSpec(3, 1, height_ratios=[0.15, 1, 0.15], figure=fig)
+
+    ax = plt.subplot(gs[0, :])
+    add_title(ax, f"{year}")
+
+    ax = plt.subplot(gs[1, 0])
+    add_pyramide(ax, pyramides[year], median, age_min)
+
+    ax = plt.subplot(gs[2, :])
+    add_watermark(ax)
+
+    gs.update(hspace=-0.05)
+
+    return fig
+
+
+import imageio
+from pygifsicle import optimize
+
+filenames = []
+for year in range(1965, 2021):
+    if year % 10 == 0:
+        print(year)
+    plt.clf()
+
+    median = medians[year]
+    age_min = 18
+    if year < 1975:
+        age_min = 21
+
+    fig = plot_pyramide(pyramides[year], median, age_min)
+    filename = f"intentions-pairwise-{year}.png"
+    plt.savefig(filename, bbox_inches="tight")
+    filenames.append(filename)
+
+with imageio.get_writer("pyramide-median-animation.gif", mode="I") as writer:
+    for filename in filenames:
+        for _ in range(3):
+            image = imageio.imread(filename)
+            writer.append_data(image)
+
+    for _ in range(20):
+        image = imageio.imread(filename)
+        writer.append_data(image)
+
+optimize("pyramide-median-animation.gif", "optimized.gif")  # For creating a new one
+
+for filename in set(filenames):
+    os.remove(filename)
+
+"optimized.gif"
+#+end_src
+
+#+attr_org: :width 400
+#+RESULTS:
+[[file:optimized.gif]]
+
+#+begin_src python :session :results file :exports results :var filename=(org-babel-temp-file "figure_" ".png")
+year = 2015
+
+def add_title(ax, title):
+    ax.text(
+        0.5,
+        1.,
+        title,
+        ha="center",
+        va="top",
+        fontname="Futura PT",
+        fontsize=25,
+        fontweight="bold",
+    )
+    ax.axis("off")
+
+fig = plt.figure(figsize=(12,8))
+gs = gridspec.GridSpec(3, 3, height_ratios = [.15,1,.15], figure=fig)
+
+ax = plt.subplot(gs[0, :])
+add_title(ax, f"{year}")
+
+ax = plt.subplot(gs[1,0])
+ages = list(pyramides[year].keys())[18:]
+num_votes = list(pyramides[year].values())[18:]
+ax.barh(
+    ages,
+    num_votes,
+    height=1.0,
+    align="edge",
+    color="black",
+    ec="white",
+    label="(Presque) certains d'aller voter",
+)
+
+ax.spines["right"].set_visible(False)
+ax.spines["top"].set_visible(False)
+ax.spines["left"].set_visible(False)
+
+ax.spines["right"].set_position(('outward', 10))
+ax.spines["bottom"].set_position(('outward', 10))
+
+ax.tick_params('y', length=0)
+ax.set_yticks([18, 25, 35, 50, 60, 70, 80, 90, 100])
+ax.set_ylim([18,100])
+ax.set_ylabel("Âge révolu")
+
+ax.set_xlabel("Population (en milliers)")
+ax.set_xlim([0, max(num_votes)])
+ax.set_xticks([100_000, 300_000, 500_000, 700_000, 900_000], [100, 300, 500, 700, 900])
+
+ax = plt.subplot(gs[1,1:])
+election = [1965, 1969, 1974, 1981, 1988, 1995, 2002, 2007, 2012, 2017]
+
+election_years = [e for e in election if e <= year]
+for y in election_years:
+    ax.vlines(y, ymin=40, ymax=medians[year], ls='--', color='lightgray')
+    ax.text(y, 0.5+medians[y], f"{medians[y]}", ha="center", va="bottom", fontname="Futura PT", fontweight="bold", fontsize=18)
+
+ax.plot(election_years, [medians[y] for y in election_years], 'k--o')
+ax.set_xlabel("Annéee (élection présidentielle au suffrage universel)", fontname="Futura PT", fontsize=16)
+ax.spines["top"].set_visible(False)
+ax.spines["right"].set_visible(False)
+ax.spines["left"].set_visible(False)
+
+ax.set_xlim([1958, 2019])
+ax.set_ylim([40, 51])
+ax.set_xticks(election)
+
+ax.set_yticks([])
+
+
+ax = plt.subplot(gs[2, :])
+ax.text(
+    1,
+    -0.1,
+    f"Tracé avec soin par @pollsposition",
+    ha="right",
+    va="top",
+    fontname="Futura PT",
+    fontsize=12,
+    color="lightgray"
+)
+ax.axis("off")
+gs.update(hspace=-0.05)
+
+plt.savefig(filename, bbox_inches="tight")
+filename
+#+end_src
+
+#+attr_org: :width 600
+#+RESULTS:
+[[file:/tmp/babel-f4mdNy/figure_RLxEiG.png]]
+
+La conclusion est claire :
+
+#+begin_quote
+L'âge médian de l'électorat n'a jamais été aussi élevé et continue encore à grimper.
+#+end_quote
+
+Ceci est d'autant plus vrai que, comme nous l'avons vu dans la [[id:pyramide-vote-participation][note #1]], la participation augmente avec l'âge.
+
+Il serait intéressant, comme on me l'a suggéré sur Twitter, de pondérer la courve précédente par le taux de participation depuis 1965. La question qui me taraude : la baisse du taux de participation aux élections est-elle corrélée avec la hausse de l'âge médian ? On peut imaginer, mais c'est pure spéculation de ma part, que le vieillissement du corps électoral correspond à une offre politique vieillissante elle aussi. Je n'ai pas assez d'information aujourd'hui pour conclure.
+
+Après les réactions à la publication de la première note j'anticipe les réactions acerbes. Elles partent du principe que l'âge est un facteur explicatif du vote, c'est-à-dire qu'une classe d'âge vote pour protéger les intérêts qui lui sont propores. Il est effectivement assez connu que les populations âgées votent plus à droite que les populations les plus jeunes. Dans la prochaine note nous nous intéresseront à la pyramide des âges des intentions de vote pour les différents candidats à la prochaine présidentielle.
+
 
 Récupérer les données de la pyramide des âges depuis X
 
 https://www.insee.fr/fr/outil-interactif/5014911/pyramide.htm#!y=2058&c=0
 
 Plot median age of voting per year. Then gif showing the evolution of both the pyramide and the median age.
-** TODO La pyramide du vote III - Le candidat des jeunes :visualisation:
+
+- [[https://www.insee.fr/fr/statistiques/3312958][Animation depuis le début du XXe siècle]]
+-
+
+Les
+
+** TODO Note #3 - Le candidat des jeunes ? :visualisation:
+:PROPERTIES:
+:EXPORT_FILE_NAME: candidat-des-jeunes
+:EXPORT_DESCRIPTION: Qui est le candidat des jeunes ?
+:EXPORT_DATE: 2022-03-14
+:CUSTOM_ID: pyramide-vote-candidat-jeunes
+:END:
+
+Someting
+
 
 * Energie
 ** TODO L'énergie nucléaire n'est pas intermittente
