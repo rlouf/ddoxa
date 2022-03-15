@@ -651,9 +651,6 @@ https://www.insee.fr/fr/outil-interactif/5014911/pyramide.htm#!y=2058&c=0
 Plot median age of voting per year. Then gif showing the evolution of both the pyramide and the median age.
 
 - [[https://www.insee.fr/fr/statistiques/3312958][Animation depuis le début du XXe siècle]]
--
-
-Les
 
 ** TODO Note #3 - Le candidat des jeunes ? :visualisation:
 :PROPERTIES:

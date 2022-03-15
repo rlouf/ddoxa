@@ -5,7 +5,6 @@ description = "Pyramide des âges et participation aux élections."
 date = 2022-03-10
 tags = ["visualisation", "politique"]
 draft = false
-math = true
 +++
 
 Une période électorale qui se respecte se doit de rappeler quelques lieux communs. Avec la montée des taux d'abstention et du commentariat professionnel s'est installée l'idée que si les jeunes ont à subir des politiques menées pour séduire les plus âgés, c'est bien parce qu'ils ne votent pas.
