@@ -287,7 +287,7 @@ young = get_number_of_votes(population, seuils,  participation_young)
 print(18 + bisect.bisect_left(np.cumsum(young)/np.sum(young), 0.5))
 #+end_src
 
-** Note #2 - La pyramide du vote: depuis 1958 :visualisation:
+** Note #2 - Pyramide des âges dans la Ve République :visualisation:
 :PROPERTIES:
 :EXPORT_FILE_NAME: pyramide-vote-historique
 :EXPORT_DESCRIPTION: Pyramide des âges dans la 5e République
